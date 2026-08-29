@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการแต้ม - เวลาพักคาเฟ่</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
+        body { background: #121212; color: #fff; padding: 20px; display: flex; justify-content: center; }
+        .admin-card { background: #1e1e1e; width: 100%; max-width: 550px; padding: 24px; border-radius: 20px; border: 1px solid #333; }
+        h2 { color: #f59e0b; margin-bottom: 20px; text-align: center; }
+        
+        .live-queue-box, .history-section-box {
+            background: #2a241e;
+            border: 1px solid #f59e0b;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 20px;
+        }
+        .queue-title { font-size: 14px; font-weight: 600; color: #f59e0b; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-clear-all {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Swipe container สำหรับปัดซ้ายลบ */
+        .swipe-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            background: #ef4444;
+        }
+        .btn-delete-swipe {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 70px;
+            background: #ef4444;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            z-index: 1;
+        }
+        .queue-item {
+            position: relative;
+            z-index: 2;
+            background: #181310;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease-out;
+            touch-action: pan-y;
+        }
+        .queue-info { font-size: 14px; }
+        .queue-info strong { color: #fef3c7; font-size: 16px; }
+        .btn-quick-add {
+            background: #f59e0b;
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .search-container { position: relative; margin-bottom: 16px; }
+        label { display: block; font-size: 14px; color: #aaa; margin-bottom: 6px; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #2a2a2a; color: #fff; font-size: 16px; outline: none; }
+        
+        .autocomplete-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #282828;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 99;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            display: none;
+            margin-top: 4px;
+        }
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .autocomplete-item:hover { background: #383838; }
+        .autocomplete-name { font-weight: 600; color: #f59e0b; }
+        .autocomplete-phone { font-size: 13px; color: #aaa; }
+
+        .btn-search { width: 100%; background: #f59e0b; color: #000; font-weight: 700; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 16px; margin-top: 8px; }
+        
+        .result-box { background: #2a2a2a; border-radius: 14px; padding: 18px; margin-top: 20px; display: none; text-align: center; }
+        
+        .edit-name-box { display: flex; gap: 8px; margin-bottom: 6px; justify-content: center; }
+        .input-cust-name { background: #1e1e1e; border: 1px solid #555; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 16px; font-weight: 600; text-align: center; width: 70%; }
+        .btn-save-name { background: #f59e0b; color: #000; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px; white-space: nowrap; }
+
+        .pts-badge { font-size: 32px; font-weight: 700; color: #f59e0b; margin: 6px 0; }
+        .section-label { font-size: 13px; color: #aaa; margin-top: 14px; margin-bottom: 8px; font-weight: 500; text-align: left; }
+        .num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .btn-num { background: #10b981; color: #fff; border: none; padding: 10px 0; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; }
+        .btn-sub-num { background: #ef4444; color: #fff; border: none; padding: 8px 0; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
+        .btn-use-voucher { background: #eab308; color: #000; width: 100%; margin-top: 14px; padding: 12px; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; }
+        
+        .btn-delete-customer { background: transparent; color: #ef4444; border: 1px solid #ef4444; width: 100%; margin-top: 14px; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+        .btn-delete-customer:hover { background: #ef4444; color: #fff; }
+
+        .history-section { margin-top: 30px; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .history-title { font-size: 16px; font-weight: 600; color: #f59e0b; }
+        .date-picker-input { width: auto; padding: 6px 10px; font-size: 13px; background: #2a2a2a; border: 1px solid #f59e0b; color: #fff; border-radius: 8px; }
+        
+        .customer-list { display: flex; flex-direction: column; gap: 8px; }
+        .history-card-item {
+            position: relative;
+            z-index: 2;
+            background: #252525;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease-out;
+            touch-action: pan-y;
+        }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { 
+            background: #1e1e1e; 
+            width: 90%; 
+            max-width: 400px; 
+            padding: 20px; 
+            border-radius: 16px; 
+            border: 1px solid #444; 
+            position: relative; 
+            max-height: 85vh; 
+            display: flex;
+            flex-direction: column;
+        }
+        .close-btn { position: absolute; top: 12px; right: 16px; font-size: 20px; cursor: pointer; color: #aaa; z-index: 10; }
+        
+        /* ปรับให้รายการใน Modal เลื่อนขึ้น-ลงได้ */
+        #modalLogs {
+            overflow-y: auto;
+            max-height: 40vh;
+            margin-bottom: 10px;
+            padding-right: 4px;
+        }
+
+        .modal-detail-item { padding: 8px 0; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-size: 14px; }
+        .tag-add { color: #10b981; font-weight: 600; }
+        .tag-sub { color: #ef4444; font-weight: 600; }
+        .tag-voucher { color: #eab308; font-weight: 600; }
+        .btn-modal-action { background: #f59e0b; color: #000; border: none; width: 100%; padding: 10px; border-radius: 10px; font-weight: 700; margin-top: 5px; cursor: pointer; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+<!-- 🔒 ระบบรหัสผ่าน -->
+<div id="authModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 99999;">
+  <div style="background: #222; padding: 25px; border-radius: 12px; text-align: center; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+    <h3 style="color: #fff; margin-bottom: 15px; font-size: 18px;">🔒 ใส่รหัสผ่านหลังร้าน</h3>
+    <input type="password" id="adminPasswordInput" placeholder="รหัสผ่าน" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #333; color: #fff; text-align: center; font-size: 16px; margin-bottom: 15px; outline: none;">
+    <button onclick="checkAdminPassword()" style="width: 100%; padding: 10px; background: #ff9800; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">เข้าสู่ระบบ</button>
+    <p id="authErrorMsg" style="color: #ff5252; font-size: 13px; margin-top: 10px; display: none;">รหัสผ่านไม่ถูกต้อง!</p>
+  </div>
+</div>
+
+<div class="admin-card">
+    <h2>⚡ ระบบจัดการแต้มพนักงาน</h2>
+
+    <div class="live-queue-box">
+        <div class="queue-title">
+            <span>🔔 ลูกค้าเพิ่งเช็คอิน/ใส่ชื่อ</span>
+            <button class="btn-clear-all" onclick="clearAllQueue()">ล้างทั้งหมด</button>
+        </div>
+        <div id="queueList">
+            <div style="font-size: 12px; color: #777; text-align: center;">ยังไม่มีลูกค้าลงทะเบียนใหม่</div>
+        </div>
+    </div>
+
+    <hr style="border-color: #333; margin-bottom: 20px;">
+
+    <div class="search-container">
+        <label>ค้นหาด้วยเบอร์โทรศัพท์ หรือ ชื่อลูกค้า</label>
+        <input type="text" id="searchInput" placeholder="กรอกเบอร์โทร 10 หลัก หรือ ชื่อลูกค้า" oninput="handleSearchInput()" autocomplete="off">
+        <div class="autocomplete-box" id="autoBox"></div>
+        <button class="btn-search" onclick="searchCustomer()">ค้นหาข้อมูล</button>
+    </div>
+
+    <div class="result-box" id="resultBox">
+        <div class="edit-name-box">
+            <input type="text" id="custNameInput" class="input-cust-name" placeholder="กรอกชื่อลูกค้า">
+            <button class="btn-save-name" onclick="saveCustomerName()">💾 บันทึกชื่อ</button>
+        </div>
+        
+        <div id="custPhone" style="font-size: 14px; color: #aaa; margin-bottom: 8px;"></div>
+        
+        <div class="pts-badge"><span id="custPoints">0</span> แต้ม</div>
+        <div style="font-size: 14px; color: #f59e0b;">คูปองสะสมฟรี: <strong id="custVouchers">0</strong> ใบ</div>
+
+        <div class="section-label">➕ เพิ่มจำนวนแก้ว:</div>
+        <div class="num-grid">
+            <button class="btn-num" onclick="updatePoints(1)">+1</button>
+            <button class="btn-num" onclick="updatePoints(2)">+2</button>
+            <button class="btn-num" onclick="updatePoints(3)">+3</button>
+            <button class="btn-num" onclick="updatePoints(4)">+4</button>
+            <button class="btn-num" onclick="updatePoints(5)">+5</button>
+            <button class="btn-num" onclick="updatePoints(6)">+6</button>
+            <button class="btn-num" onclick="updatePoints(7)">+7</button>
+            <button class="btn-num" onclick="updatePoints(8)">+8</button>
+            <button class="btn-num" onclick="updatePoints(9)">+9</button>
+            <button class="btn-num" onclick="updatePoints(10)">+10</button>
+        </div>
+
+        <div class="section-label" style="color: #ef4444;">↩️ แก้ไข (ลดแต้ม):</div>
+        <div class="num-grid">
+            <button class="btn-sub-num" onclick="updatePoints(-1)">-1</button>
+            <button class="btn-sub-num" onclick="updatePoints(-2)">-2</button>
+            <button class="btn-sub-num" onclick="updatePoints(-3)">-3</button>
+            <button class="btn-sub-num" onclick="updatePoints(-4)">-4</button>
+            <button class="btn-sub-num" onclick="updatePoints(-5)">-5</button>
+        </div>
+
+        <button class="btn-use-voucher" onclick="useVoucher()">🎁 ใช้คูปองฟรี 1 ใบ</button>
+        <button class="btn-delete-customer" onclick="deleteCurrentCustomer()">🗑️ ลบข้อมูลลูกค้ารายนี้ทั้งหมด</button>
+    </div>
+
+    <!-- ส่วนประวัติย้อนหลัง -->
+    <div class="history-section">
+        <div class="history-header">
+            <div class="history-title">📅 ประวัติย้อนหลัง</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="btn-clear-all" onclick="clearTodayHistory()">ล้างประวัติวันนี้</button>
+                <input type="date" id="historyDate" class="date-picker-input" onchange="loadHistoryByDate()">
+            </div>
+        </div>
+        <div class="customer-list" id="customerHistoryList">
+            <div style="text-align: center; color: #777; padding: 15px;">กำลังโหลด...</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="detailModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h3 id="modalCustName" style="color: #f59e0b; margin-bottom: 4px;"></h3>
+        <div id="modalCustPhone" style="font-size: 13px; color: #aaa; margin-bottom: 12px;"></div>
+        
+        <!-- ส่วนรายการที่จะเลื่อนขึ้น-ลงได้ -->
+        <div id="modalLogs"></div>
+
+        <button class="btn-modal-action" id="btnSelectFromHistory" style="margin-top: 5px;">⚡ จัดการแต้มลูกค้ารายนี้</button>
+        <button onclick="closeModal()" style="background: #444; color: #fff; border: none; width: 100%; padding: 10px; border-radius: 10px; font-weight: 600; margin-top: 8px; cursor: pointer;">✕ ปิดหน้าต่างนี้</button>
+    </div>
+</div>
+
+<script>
+    const ADMIN_SECRET_CODE = "1234"; // เปลี่ยนรหัสผ่านตรงนี้ได้ตามต้องการ
+
+    function checkAdminPassword() {
+        const inputVal = document.getElementById('adminPasswordInput').value;
+        if (inputVal === ADMIN_SECRET_CODE) {
+            document.getElementById('authModal').style.display = 'none';
+            sessionStorage.setItem('isAdminLoggedIn', 'true');
+        } else {
+            document.getElementById('authErrorMsg').style.display = 'block';
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+            document.getElementById('authModal').style.display = 'none';
+        }
+    });
+
+    const firebaseConfig = { databaseURL: "https://wela-phak-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let activePhone = '';
+    let dailyLogsMap = {};
+    let allCustomersCache = [];
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('historyDate').value = todayStr;
+
+    database.ref('loyalty').on('value', (snapshot) => {
+        allCustomersCache = [];
+        if (snapshot.exists()) {
+            snapshot.forEach(child => {
+                const phone = child.key;
+                const val = child.val();
+                allCustomersCache.push({ phone: phone, name: val.name || '', points: val.points || 0, vouchers: val.vouchers || 0 });
+            });
+        }
+    });
+
+    database.ref('recent_checkins').limitToLast(10).on('value', (snapshot) => {
+        const queueList = document.getElementById('queueList');
+        queueList.innerHTML = '';
+        if (!snapshot.exists()) {
+            queueList.innerHTML = '<div style="font-size: 12px; color: #777; text-align: center;">ยังไม่มีลูกค้าลงทะเบียนใหม่</div>';
+            return;
+        }
+
+        snapshot.forEach(child => {
+            const key = child.key;
+            const item = child.val();
+            const wrapper = document.createElement('div');
+            wrapper.className = 'swipe-wrapper';
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn-delete-swipe';
+            delBtn.innerText = 'ลบ';
+            delBtn.onclick = () => deleteQueueItem(key);
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'queue-item';
+            itemDiv.innerHTML = `<div class="queue-info"><strong>คุณ ${item.name}</strong> (${item.phone})</div><button class="btn-quick-add" onclick="quickSelect('${item.phone}')">จัดการ</button>`;
+
+            let startX = 0;
+            itemDiv.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+            itemDiv.addEventListener('touchmove', e => {
+                let diffX = e.touches[0].clientX - startX;
+                if (diffX < 0 && diffX > -80) itemDiv.style.transform = `translateX(${diffX}px)`;
+            });
+            itemDiv.addEventListener('touchend', e => {
+                let diffX = e.changedTouches[0].clientX - startX;
+                itemDiv.style.transform = diffX < -40 ? 'translateX(-70px)' : 'translateX(0px)';
+            });
+
+            wrapper.appendChild(delBtn);
+            wrapper.appendChild(itemDiv);
+            queueList.insertBefore(wrapper, queueList.firstChild);
+        });
+    });
+
+    function deleteQueueItem(key) { database.ref('recent_checkins/' + key).remove(); }
+    function clearAllQueue() { if (confirm('ล้างคิวทั้งหมด?')) database.ref('recent_checkins').remove(); }
+
+    function handleSearchInput() {
+        const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+        const autoBox = document.getElementById('autoBox');
+        autoBox.innerHTML = '';
+        if (!keyword) { autoBox.style.display = 'none'; return; }
+
+        const matches = allCustomersCache.filter(c => c.phone.toLowerCase().includes(keyword) || c.name.toLowerCase().includes(keyword));
+        if (matches.length === 0) { autoBox.style.display = 'none'; return; }
+
+        matches.forEach(cust => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerHTML = `<div><span class="autocomplete-name">คุณ ${cust.name || 'ไม่มีชื่อ'}</span> <span class="autocomplete-phone">(${cust.phone})</span></div><span style="font-size:12px; color:#f59e0b;">${cust.points} แต้ม</span>`;
+            item.onclick = () => { document.getElementById('searchInput').value = cust.phone; autoBox.style.display = 'none'; quickSelect(cust.phone); };
+            autoBox.appendChild(item);
+        });
+        autoBox.style.display = 'block';
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) document.getElementById('autoBox').style.display = 'none';
+    });
+
+    function loadHistoryByDate() {
+        const selectedDate = document.getElementById('historyDate').value;
+        const listContainer = document.getElementById('customerHistoryList');
+        listContainer.innerHTML = '';
+        dailyLogsMap = {};
+
+        database.ref('history').orderByChild('date').equalTo(selectedDate).on('value', (snapshot) => {
+            listContainer.innerHTML = '';
+            dailyLogsMap = {};
+
+            if (!snapshot.exists()) {
+                listContainer.innerHTML = '<div style="text-align: center; color: #777; padding: 15px;">ไม่มีรายการในวันที่เลือก</div>';
+                return;
+            }
+
+            snapshot.forEach(child => {
+                const logKey = child.key;
+                const log = child.val();
+                if (!dailyLogsMap[log.phone]) {
+                    dailyLogsMap[log.phone] = { name: log.name || 'ลูกค้า', phone: log.phone, logs: [], logKeys: [] };
+                }
+                dailyLogsMap[log.phone].logs.unshift(log);
+                dailyLogsMap[log.phone].logKeys.unshift(logKey);
+            });
+
+            Object.keys(dailyLogsMap).forEach(phone => {
+                const cust = dailyLogsMap[phone];
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'swipe-wrapper';
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn-delete-swipe';
+                delBtn.innerText = 'ลบ';
+                delBtn.onclick = () => deleteCustomerHistoryLogs(phone);
+
+                const card = document.createElement('div');
+                card.className = 'history-card-item';
+                card.innerHTML = `
+                    <div style="flex:1; cursor:pointer;" onclick="openDetailModal('${phone}')">
+                        <strong style="color: #fff; font-size: 15px;">คุณ ${cust.name}</strong>
+                        <div style="font-size: 12px; color: #aaa;">${cust.phone} (${cust.logs.length} รายการวันนี้)</div>
+                    </div>
+                    <button class="btn-quick-add" onclick="quickSelect('${phone}')">⚡ จัดการ</button>
+                `;
+
+                let startX = 0;
+                card.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+                card.addEventListener('touchmove', e => {
+                    let diffX = e.touches[0].clientX - startX;
+                    if (diffX < 0 && diffX > -80) card.style.transform = `translateX(${diffX}px)`;
+                });
+                card.addEventListener('touchend', e => {
+                    let diffX = e.changedTouches[0].clientX - startX;
+                    card.style.transform = diffX < -40 ? 'translateX(-70px)' : 'translateX(0px)';
+                });
+
+                wrapper.appendChild(delBtn);
+                wrapper.appendChild(card);
+                listContainer.appendChild(wrapper);
+            });
+        });
+    }
+
+    loadHistoryByDate();
+
+    function deleteCustomerHistoryLogs(phone) {
+        if (!confirm(`ต้องการลบประวัติทั้งหมดของเบอร์ ${phone} ในวันนี้ใช่หรือไม่?`)) return;
+        const cust = dailyLogsMap[phone];
+        if (!cust || !cust.logKeys) return;
+
+        let updates = {};
+        cust.logKeys.forEach(key => { updates[key] = null; });
+        database.ref('history').update(updates).then(() => {
+            alert('ลบประวัติของลูกค้ารายนี้เรียบร้อย');
+        });
+    }
+
+    function clearTodayHistory() {
+        const selectedDate = document.getElementById('historyDate').value;
+        if (!confirm(`คุณต้องการลบประวัติการทำรายการทั้งหมดของวันที่ ${selectedDate} ใช่หรือไม่?`)) return;
+
+        database.ref('history').orderByChild('date').equalTo(selectedDate).once('value', snapshot => {
+            if (!snapshot.exists()) return;
+            let updates = {};
+            snapshot.forEach(child => { updates[child.key] = null; });
+            database.ref('history').update(updates).then(() => {
+                alert('ล้างประวัติของวันนี้เรียบร้อยแล้ว');
+            });
+        });
+    }
+
+    function openDetailModal(phone) {
+        const cust = dailyLogsMap[phone];
+        if (!cust) return;
+        document.getElementById('modalCustName').innerText = `คุณ ${cust.name}`;
+        document.getElementById('modalCustPhone').innerText = `เบอร์โทร: ${cust.phone}`;
+
+        const modalLogs = document.getElementById('modalLogs');
+        modalLogs.innerHTML = '';
+        cust.logs.forEach(log => {
+            const div = document.createElement('div');
+            div.className = 'modal-detail-item';
+            let tag = log.type === 'add' ? `<span class="tag-add">+${log.amount} แต้ม</span>` :
+                      log.type === 'sub' ? `<span class="tag-sub">-${log.amount} แต้ม</span>` : `<span class="tag-voucher">ใช้คูปองฟรี</span>`;
+            div.innerHTML = `<span style="color: #aaa;">🕒 ${log.time} น.</span><span>${tag}</span>`;
+            modalLogs.appendChild(div);
+        });
+
+        document.getElementById('btnSelectFromHistory').onclick = () => { closeModal(); quickSelect(phone); };
+        document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
+    function quickSelect(phone) {
+        document.getElementById('searchInput').value = phone;
+        document.getElementById('autoBox').style.display = 'none';
+        searchCustomer();
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+    }
+
+    function searchCustomer() {
+        const query = document.getElementById('searchInput').value.trim();
+        document.getElementById('autoBox').style.display = 'none';
+        if (!query) { alert('กรุณากรอกเบอร์โทร หรือ ชื่อลูกค้า'); return; }
+
+        if (/^\d+$/.test(query)) {
+            fetchCustomerByPhone(query);
+        } else {
+            const matches = allCustomersCache.filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
+            if (matches.length === 0) alert(`ไม่พบข้อมูล "${query}"`);
+            else if (matches.length === 1) fetchCustomerByPhone(matches[0].phone);
+            else { handleSearchInput(); alert(`พบ ${matches.length} คน กรุณาเลือกเบอร์จากรายการด้านล่าง`); }
+        }
+    }
+
+    function fetchCustomerByPhone(phone) {
+        activePhone = phone;
+        database.ref('loyalty/' + phone).on('value', (snapshot) => {
+            const data = snapshot.exists() ? snapshot.val() : { points: 0, vouchers: 0, name: '' };
+            document.getElementById('resultBox').style.display = 'block';
+            document.getElementById('custNameInput').value = data.name || '';
+            document.getElementById('custPhone').innerText = phone;
+            document.getElementById('custPoints').innerText = data.points || 0;
+            document.getElementById('custVouchers').innerText = data.vouchers || 0;
+        });
+    }
+
+    function saveCustomerName() {
+        if (!activePhone) return;
+        const newName = document.getElementById('custNameInput').value.trim();
+        database.ref('loyalty/' + activePhone).update({ name: newName }).then(() => alert('บันทึกชื่อเรียบร้อย'));
+    }
+
+    function logHistory(phone, name, type, amount) {
+        const now = new Date();
+        database.ref('history').push({
+            phone: phone, name: name, type: type, amount: amount,
+            date: now.toISOString().split('T')[0],
+            time: now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0'),
+            timestamp: Date.now()
+        });
+    }
+
+    function updatePoints(change) {
+        if (!activePhone) return;
+        database.ref('loyalty/' + activePhone).once('value', (snapshot) => {
+            let pts = (snapshot.exists() && snapshot.val().points) ? snapshot.val().points : 0;
+            let vchs = (snapshot.exists() && snapshot.val().vouchers) ? snapshot.val().vouchers : 0;
+            let finalName = document.getElementById('custNameInput').value.trim() || (snapshot.val()?.name || '');
+
+            pts += change;
+            if (pts < 0) pts = 0;
+            if (pts >= 10) {
+                const newVs = Math.floor(pts / 10);
+                vchs += newVs;
+                pts %= 10;
+                alert(`🎉 ครบ 10 แต้ม! ได้รับคูปอง ${newVs} ใบ`);
+            }
+
+            database.ref('loyalty/' + activePhone).set({ points: pts, vouchers: vchs, name: finalName });
+            logHistory(activePhone, finalName, change > 0 ? 'add' : 'sub', Math.abs(change));
+        });
+    }
+
+    function useVoucher() {
+        if (!activePhone) return;
+        database.ref('loyalty/' + activePhone).once('value', (snapshot) => {
+            if (!snapshot.exists() || (snapshot.val().vouchers || 0) <= 0) { alert('ไม่มีคูปองคงเหลือ'); return; }
+            let data = snapshot.val();
+            database.ref('loyalty/' + activePhone).update({ vouchers: data.vouchers - 1 });
+            logHistory(activePhone, data.name || '', 'voucher', 1);
+            alert('ใช้คูปองสำเร็จ!');
+        });
+    }
+
+    function deleteCurrentCustomer() {
+        if (!activePhone) return;
+        if (!confirm(`⚠️ ยืนยันการลบข้อมูลเบอร์ ${activePhone}?\n(ข้อมูลแต้ม คูปอง ชื่อ และประวัติการทำรายการทั้งหมดของเบอร์นี้จะถูกลบหายไปถาวร)`)) return;
+
+        database.ref('loyalty/' + activePhone).remove().then(() => {
+            database.ref('history').orderByChild('phone').equalTo(activePhone).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    let updates = {};
+                    snapshot.forEach(child => { updates[child.key] = null; });
+                    database.ref('history').update(updates);
+                }
+            });
+
+            database.ref('recent_checkins').orderByChild('phone').equalTo(activePhone).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    let updates = {};
+                    snapshot.forEach(child => { updates[child.key] = null; });
+                    database.ref('recent_checkins').update(updates);
+                }
+            });
+
+            alert('ลบข้อมูลและประวัติทุกอย่างของลูกค้ารายนี้เรียบร้อยแล้วครับ');
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('searchInput').value = '';
+            activePhone = '';
+        }).catch(err => {
+            alert('เกิดข้อผิดพลาด: ' + err.message);
+        });
+    }
+</script>
+
+</body>
+</html>
