@@ -17,7 +17,7 @@
             display: inline-block; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-bottom: 16px; border: 1px solid rgba(245, 158, 11, 0.3);
         }
         .header-title-container { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
-        .inline-logo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #f59e0b; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3); background: #fff; }
+        .inline-logo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #f59e0b; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #333; }
         .logo { font-size: 26px; font-weight: 700; color: #f59e0b; line-height: 1.2; }
         .subtitle { font-size: 14px; color: #a1a1aa; margin-bottom: 24px; }
         .phone-input-box { 
@@ -42,7 +42,6 @@
             width: 100%; aspect-ratio: 1; border: 2px dashed #4a3c33; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: #71717a; background: #181310; overflow: hidden; padding: 2px;
         }
         .stamp-slot.active { border: 2px solid #f59e0b; background: #3d2f24; }
-        .stamp-img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
         .pts-footer { margin-top: 15px; font-size: 14px; color: #a1a1aa; }
         .pts-highlight { font-size: 22px; font-weight: 700; color: #f59e0b; }
     </style>
@@ -55,7 +54,7 @@
     <div class="brand-badge">VELAPAK LOYALTY</div>
     
     <div class="header-title-container">
-        <img id="headerLogo" src="" alt="โลโก้" class="inline-logo">
+        <div id="headerLogo" class="inline-logo">☕</div>
         <div class="logo">เวลาพักคาเฟ่</div>
     </div>
     
@@ -94,39 +93,31 @@
 </div>
 
 <script>
-    const logoSources = [
-        "logo.png",
-        "https://raw.githubusercontent.com/tcutxhjugcy-dev/wela-phak-cafe/main/logo.png"
-    ];
-
-    function applyImageWithFallback(imgElement) {
-        let index = 0;
-        imgElement.src = logoSources[index];
-        imgElement.onerror = function() {
-            index++;
-            if (index < logoSources.length) {
-                this.src = logoSources[index];
-            }
-        };
-    }
-
-    applyImageWithFallback(document.getElementById('headerLogo'));
-
     const firebaseConfig = { databaseURL: "https://wela-phak-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/" };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const database = firebase.database();
 
     let currentPhone = '';
 
     function checkPoints() {
         const phone = document.getElementById('userPhone').value.trim();
-        if (phone.length < 9) { alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง'); return; }
+        if (phone.length < 9) { 
+            alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง'); 
+            return; 
+        }
         currentPhone = phone;
 
-        database.ref('loyalty/' + phone).on('value', (snapshot) => {
-            const data = snapshot.exists() ? snapshot.val() : {};
-            renderStamps(phone, data.name || '', data.points || 0, data.vouchers || 0);
-        });
+        database.ref('loyalty/' + phone).once('value')
+            .then((snapshot) => {
+                const data = snapshot.exists() ? snapshot.val() : {};
+                renderStamps(phone, data.name || '', data.points || 0, data.vouchers || 0);
+            })
+            .catch((error) => {
+                console.error("Firebase Error:", error);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้ง");
+            });
     }
 
     function saveCustomerName() {
@@ -168,11 +159,7 @@
             slot.className = `stamp-slot ${i <= points ? 'active' : ''}`;
             
             if (i <= points) {
-                const img = document.createElement('img');
-                img.className = 'stamp-img';
-                img.alt = 'แต้ม';
-                applyImageWithFallback(img);
-                slot.appendChild(img);
+                slot.innerHTML = '☕';
             } else {
                 slot.innerText = i;
             }
