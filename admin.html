@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เวลาพักคาเฟ่ - ระบบหลังบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
+        body { background: #1a1512; color: #f8fafc; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 520px; }
+        .card { background: #2b221c; border-radius: 20px; padding: 20px; border: 1px solid #42342b; margin-bottom: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .title { font-size: 18px; font-weight: 700; color: #f59e0b; margin-bottom: 4px; text-align: center; }
+        .subtitle { font-size: 13px; color: #a1a1aa; text-align: center; margin-bottom: 16px; }
+        
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 13px; color: #fcd34d; margin-bottom: 6px; }
+        input, select { width: 100%; padding: 10px 12px; background: #181310; border: 1px solid #554235; border-radius: 10px; color: #fff; font-size: 15px; outline: none; }
+        
+        button { width: 100%; padding: 12px; background: #f59e0b; color: #1a0f00; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; }
+        button:hover { background: #d97706; }
+
+        .result-box { background: #181310; border-radius: 14px; padding: 16px; border: 1px solid #3d3027; margin-top: 14px; display: none; }
+        .customer-name { font-size: 17px; font-weight: 600; color: #fef3c7; margin-bottom: 2px; }
+        .customer-detail { font-size: 13px; color: #a1a1aa; margin-bottom: 12px; }
+        
+        .action-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+        .btn-add { background: #10b981; color: #fff; flex: 1; }
+        .btn-add:hover { background: #059669; }
+        .btn-deduct { background: #ef4444; color: #fff; padding: 12px; width: auto; font-size: 13px; }
+        .btn-deduct:hover { background: #dc2626; }
+
+        .history-list { max-height: 200px; overflow-y: auto; margin-top: 8px; }
+        .history-item { font-size: 12px; background: #181310; padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #3d3027; }
+        .history-info { color: #d4d4d8; }
+        .history-time { color: #71717a; font-size: 11px; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="card" id="loginScreen">
+        <div class="title">🔐 หลังบ้านเวลาพักคาเฟ่</div>
+        <div class="subtitle">ระบบจัดการแต้มพนักงาน</div>
+        <div class="form-group">
+            <label>รหัสผ่านผู้ดูแลระบบ</label>
+            <input type="password" id="adminPassword" placeholder="••••••••">
+        </div>
+        <button onclick="checkAdminLogin()">เข้าสู่ระบบ</button>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <div class="card">
+            <div class="title">☕ ค้นหาลูกค้า / เพิ่มแต้ม</div>
+            <div class="subtitle">พิมพ์ "ชื่อ" หรือ "เบอร์โทรศัพท์" เพื่อค้นหา</div>
+            
+            <div class="form-group">
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="searchInput" placeholder="ค้นหา ชื่อ หรือ เบอร์โทร...">
+                    <button onclick="searchCustomer()" style="width: 110px;">ค้นหา</button>
+                </div>
+            </div>
+
+            <div class="result-box" id="resultBox">
+                <div class="customer-name" id="resName">-</div>
+                <div class="customer-detail" id="resPhone">เบอร์: - | แต้มปัจจุบัน: <span id="resPoints" style="color:#f59e0b; font-weight:700;">0</span> แต้ม</div>
+                
+                <div class="form-group">
+                    <label>เลือกจำนวนแก้ว / แต้มที่จะเพิ่ม:</label>
+                    <select id="addAmount">
+                        <option value="1">+1 แก้ว (1 แต้ม)</option>
+                        <option value="2">+2 แก้ว (2 แต้ม)</option>
+                        <option value="3">+3 แก้ว (3 แต้ม)</option>
+                        <option value="4">+4 แก้ว (4 แต้ม)</option>
+                        <option value="5">+5 แก้ว (5 แต้ม)</option>
+                    </select>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn-add" onclick="modifyPoints()">➕ บันทึกเพิ่มแต้ม</button>
+                    <button class="btn-deduct" onclick="deductOnePoint()">ลด 1 แต้ม</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="title" style="font-size: 15px; text-align: left; margin-bottom: 8px;">📋 ประวัติการทำรายการวันนี้</div>
+            <div class="history-list" id="historyList">
+                <div style="text-align: center; color: #71717a; font-size: 12px; padding: 10px;">ยังไม่มีรายการวันนี้</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://wela-phak-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let foundUserKey = null;
+    let currentUserData = null;
+
+    function checkAdminLogin() {
+        const pass = document.getElementById('adminPassword').value;
+        if (pass === "081218") {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            loadHistory();
+        } else {
+            alert('รหัสผ่านไม่ถูกต้อง');
+        }
+    }
+
+    function searchCustomer() {
+        const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (!keyword) { alert('กรุณากรอกชื่อหรือเบอร์โทรเพื่อค้นหา'); return; }
+
+        database.ref('users').once('value', (snapshot) => {
+            let matchedKey = null;
+            let matchedData = null;
+
+            snapshot.forEach((child) => {
+                const val = child.val();
+                const name = (val.name || '').toLowerCase();
+                const phone = (val.phone || '');
+                if (name.includes(keyword) || phone.includes(keyword)) {
+                    matchedKey = child.key;
+                    matchedData = val;
+                }
+            });
+
+            if (matchedData) {
+                foundUserKey = matchedKey;
+                currentUserData = matchedData;
+                document.getElementById('resName').innerText = matchedData.name || 'ลูกค้าเวลาพัก';
+                document.getElementById('resPhone').innerHTML = `เบอร์: ${matchedData.phone} | แต้มปัจจุบัน: <span id="resPoints" style="color:#f59e0b; font-weight:700;">${matchedData.points || 0}</span> แต้ม`;
+                document.getElementById('resultBox').style.display = 'block';
+            } else {
+                alert('ไม่พบข้อมูลลูกค้าจากคำค้นหานี้');
+                document.getElementById('resultBox').style.display = 'none';
+                foundUserKey = null;
+            }
+        });
+    }
+
+    function modifyPoints() {
+        if (!foundUserKey) return;
+        const addVal = parseInt(document.getElementById('addAmount').value);
+        let currentPoints = currentUserData.points || 0;
+        let currentVouchers = currentUserData.vouchers || 0;
+        
+        let newPoints = currentPoints + addVal;
+        let earnedVoucher = false;
+
+        if (newPoints >= 10) {
+            newPoints = newPoints - 10;
+            currentVouchers += 1;
+            earnedVoucher = true;
+        }
+
+        database.ref('users/' + foundUserKey).update({
+            points: newPoints,
+            vouchers: currentVouchers,
+            updatedAt: Date.now()
+        }, (error) => {
+            if (!error) {
+                saveHistory(currentUserData.name, `+${addVal} แต้ม`);
+                alert(`🎉 เพิ่มแต้มสำเร็จ! ${earnedVoucher ? '\n[ลูกค้าสะสมครบ 10 แต้ม ได้รับคูปองฟรี 1 ใบ!]' : ''}`);
+                currentUserData.points = newPoints;
+                currentUserData.vouchers = currentVouchers;
+                document.getElementById('resPoints').innerText = newPoints;
+            }
+        });
+    }
+
+    function deductOnePoint() {
+        if (!foundUserKey) return;
+        let currentPoints = currentUserData.points || 0;
+        let newPoints = currentPoints - 1;
+        if (newPoints < 0) newPoints = 0;
+
+        database.ref('users/' + foundUserKey).update({
+            points: newPoints,
+            updatedAt: Date.now()
+        }, (error) => {
+            if (!error) {
+                saveHistory(currentUserData.name, `-1 แต้ม`);
+                alert('ลดแต้มสำเร็จ');
+                currentUserData.points = newPoints;
+                document.getElementById('resPoints').innerText = newPoints;
+            }
+        });
+    }
+
+    function saveHistory(customerName, actionText) {
+        const timeStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        database.ref('logs').push({
+            name: customerName,
+            action: actionText,
+            time: timeStr,
+            timestamp: Date.now()
+        });
+    }
+
+    function loadHistory() {
+        database.ref('logs').limitToLast(15).on('value', (snapshot) => {
+            const listEl = document.getElementById('historyList');
+            listEl.innerHTML = '';
+            if (!snapshot.exists()) {
+                listEl.innerHTML = '<div style="text-align: center; color: #71717a; font-size: 12px; padding: 10px;">ยังไม่มีรายการ</div>';
+                return;
+            }
+            snapshot.forEach((child) => {
+                const log = child.val();
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `<span class="history-info"><b>${log.name}</b> (${log.action})</span> <span class="history-time">${log.time}</span>`;
+                listEl.prepend(item);
+            });
+        });
+    }
+</script>
+</body>
+</html>
