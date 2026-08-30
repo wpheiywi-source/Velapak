@@ -8,10 +8,10 @@
     <style>
         * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
         body { 
-            /* พื้นหลังภาพวาดสีน้ำ พร้อมเลเยอร์สีครีมโปร่งแสงเพื่อความสบายตาและให้อ่านหนังสือได้ง่าย */
-            background-image: linear-gradient(rgba(247, 243, 237, 0.88), rgba(247, 243, 237, 0.88)), url('WLOR6331.PNG');
+            /* เอาฟิลเตอร์สีขาวออก และจัดตำแหน่งภาพพื้นหลังให้อยู่ตรงกลางพอดี */
+            background-image: url('WLOR6331.PNG');
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
             color: #4a3b32; 
@@ -23,14 +23,14 @@
             padding: 24px 16px; 
         }
         .card { 
-            background: rgba(255, 255, 255, 0.92); 
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.94); 
+            backdrop-filter: blur(10px);
             width: 100%; 
             max-width: 420px; 
             border-radius: 24px; 
             padding: 28px 22px; 
             border: 1px solid #e3d7cb; 
-            box-shadow: 0 15px 35px rgba(139, 111, 93, 0.2); 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
             text-align: center; 
         }
         .brand-badge {
@@ -38,8 +38,16 @@
         }
         .header-title-container { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
         
-        /* โลโก้กลมด้านบน */
-        .inline-logo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid #b8860b; box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3); }
+        /* แก้ไขโลโก้ด้านบนให้แสดงผลเต็มวง ไม่โดนตัดขอบ */
+        .inline-logo { 
+            width: 56px; 
+            height: 56px; 
+            border-radius: 50%; 
+            object-fit: contain; 
+            background-color: #fdfaf6;
+            border: 2px solid #b8860b; 
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3); 
+        }
         
         .logo { font-size: 26px; font-weight: 700; color: #4a3b32; line-height: 1.2; }
         .subtitle { font-size: 14px; color: #7c685c; margin-bottom: 24px; }
@@ -71,12 +79,13 @@
         }
         .stamp-slot.active { border: 2px solid #b8860b; background: #fffdf9; box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15); }
         
-        /* สไตล์รูปลักษณะวงกลมแทนที่ถ้วยกาแฟเดิมในช่องสะสมแต้ม */
+        /* แก้ไขโลโก้ในช่องแต้มด้านล่างให้แสดงเต็มวงสวยงาม */
         .stamp-logo-img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            object-fit: cover;
+            object-fit: contain;
+            background-color: #fffdf9;
         }
 
         .pts-footer { margin-top: 15px; font-size: 14px; color: #7c685c; }
@@ -91,7 +100,6 @@
     <div class="brand-badge">VELAPAK LOYALTY</div>
     
     <div class="header-title-container">
-        <!-- โลโก้หลักด้านบน -->
         <img src="IMG_1839_3.PNG" alt="เวลาพักคาเฟ่" class="inline-logo">
         <div class="logo">เวลาพักคาเฟ่</div>
     </div>
@@ -197,7 +205,6 @@
             slot.className = `stamp-slot ${i <= points ? 'active' : ''}`;
             
             if (i <= points) {
-                // ใส่โลโก้ร้านทรงกลมแทนที่ถ้วยกาแฟเดิม
                 slot.innerHTML = `<img src="IMG_1839_3.PNG" alt="Logo" class="stamp-logo-img">`;
             } else {
                 slot.innerText = i;
