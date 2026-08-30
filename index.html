@@ -3,213 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velapak Cafe - สะสมแต้ม</title>
+    <title>เวลาพัก คาเฟ่ - สะสมแต้ม</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
         body { 
-            background-image: url('WLOR6331.PNG');
+            background-image: url('HMUA5549.PNG');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: #4a3b32; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 24px 16px; 
+            color: #fff; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .card { 
-            background: rgba(255, 255, 255, 0.94); 
+        .container {
+            background: rgba(30, 30, 30, 0.92);
             backdrop-filter: blur(10px);
-            width: 100%; 
-            max-width: 420px; 
-            border-radius: 24px; 
-            padding: 28px 22px; 
-            border: 1px solid #e3d7cb; 
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
-            text-align: center; 
+            width: 100%;
+            max-width: 420px;
+            padding: 25px;
+            border-radius: 24px;
+            border: 1px solid #444;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
         }
         .brand-badge {
-            display: inline-block; background: rgba(184, 134, 11, 0.1); color: #b8860b; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-bottom: 16px; border: 1px solid rgba(184, 134, 11, 0.3);
+            background: #fef3c7;
+            color: #b45309;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 10px 16px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 20px;
+            border: 1px solid #fcd34d;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .header-title-container { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
+        h2 { color: #f59e0b; margin-bottom: 8px; font-size: 22px; }
+        p.sub-text { font-size: 14px; color: #aaa; margin-bottom: 20px; }
         
-        .inline-logo { 
-            width: 56px; 
-            height: 56px; 
-            border-radius: 50%; 
-            object-fit: contain; 
-            background-color: #fdfaf6;
-            border: 2px solid #b8860b; 
-            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3); 
-        }
-        
-        .logo { font-size: 26px; font-weight: 700; color: #4a3b32; line-height: 1.2; }
-        .subtitle { font-size: 14px; color: #7c685c; margin-bottom: 24px; }
-        
-        .phone-input-box { 
-            display: flex; gap: 8px; background: #faf8f5; padding: 6px; border-radius: 14px; border: 1px solid #dcd2c5; margin-bottom: 12px;
-        }
-        .phone-input-box input { flex: 1; padding: 10px; border: none; background: transparent; color: #4a3b32; font-size: 16px; outline: none; text-align: center; }
-        .phone-input-box input::placeholder { color: #b5a496; }
-        .phone-input-box button { background: #b8860b; color: #fff; border: none; padding: 0 18px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; }
-        .phone-input-box button:hover { background: #996f08; }
-        
-        .name-edit-box { background: #faf8f5; border: 1px solid #dcd2c5; border-radius: 14px; padding: 10px; margin-bottom: 20px; display: flex; gap: 8px; }
-        .name-edit-box input { flex: 1; background: transparent; border: none; color: #b8860b; font-size: 14px; text-align: center; outline: none; font-weight: 600; }
-        .name-edit-box button { background: #10b981; color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
-        
-        .customer-greeting { font-size: 18px; font-weight: 600; color: #4a3b32; margin-bottom: 2px; }
-        
-        .voucher-card { 
-            background: linear-gradient(135deg, #fef08a, #fde047, #eab308); border-radius: 14px; padding: 14px 18px; color: #451a03; font-weight: 700; margin: 16px 0 8px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 20px rgba(234, 179, 8, 0.3);
-        }
-        .voucher-notice {
-            font-size: 13px; color: #85581a; background: rgba(184, 134, 11, 0.08); border: 1px dashed rgba(184, 134, 11, 0.3); border-radius: 10px; padding: 8px 12px; margin-bottom: 16px; line-height: 1.4;
-        }
-        
-        .stamp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
-        .stamp-slot { 
-            width: 100%; aspect-ratio: 1; border: 2px dashed #dcd2c5; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: #b5a496; background: #faf8f5; overflow: hidden; padding: 4px;
-        }
-        .stamp-slot.active { border: 2px solid #b8860b; background: #fffdf9; box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15); }
-        
-        .stamp-logo-img {
+        .input-group { margin-bottom: 16px; text-align: left; }
+        label { display: block; font-size: 13px; color: #ccc; margin-bottom: 6px; }
+        input {
             width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: contain;
-            background-color: #fffdf9;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #555;
+            background: #222;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            text-align: center;
         }
+        input:focus { border-color: #f59e0b; }
+        
+        .btn {
+            width: 100%;
+            background: #f59e0b;
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #d97706; }
 
-        .pts-footer { margin-top: 15px; font-size: 14px; color: #7c685c; }
-        .pts-highlight { font-size: 22px; font-weight: 700; color: #b8860b; }
+        .result-card {
+            background: #262626;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #444;
+            display: none;
+        }
+        .pts-number { font-size: 38px; font-weight: 700; color: #f59e0b; margin: 5px 0; }
+        .voucher-box { background: #332d1d; border: 1px dashed #f59e0b; padding: 10px; border-radius: 10px; margin-top: 12px; color: #fef3c7; font-size: 14px; }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-<div class="card">
-    <div class="brand-badge">VELAPAK LOYALTY</div>
-    
-    <div class="header-title-container">
-        <!-- เปลี่ยนชื่อไฟล์รูปตรงนี้ให้ตรงกับในเครื่องแล้วครับ (IMG_1839.PNG) -->
-        <img src="IMG_1839.PNG" alt="เวลาพักคาเฟ่" class="inline-logo">
-        <div class="logo">เวลาพักคาเฟ่</div>
-    </div>
-    
-    <div class="subtitle">สะสมครบ 10 แต้ม รับฟรี 1 แก้ว!</div>
+<div class="container">
+    <div class="brand-badge">ขอให้มีความสุขกับการทานนะค่ะ 😊</div>
+    <h2>☕ เวลาพัก คาเฟ่</h2>
+    <p class="sub-text">เช็คแต้มสะสมและสิทธิพิเศษของคุณ</p>
 
-    <div class="phone-input-box">
-        <input type="tel" id="userPhone" placeholder="กรอกเบอร์โทรศัพท์" maxlength="10">
-        <button onclick="checkPoints()">ค้นหา</button>
+    <div class="input-group">
+        <label>เบอร์โทรศัพท์มือถือ (10 หลัก)</label>
+        <input type="tel" id="phoneInput" placeholder="0812345678" maxlength="10">
     </div>
 
-    <div id="pointDisplayArea" style="display: none;">
-        <div class="customer-greeting" id="displayGreeting"></div>
-        <div style="font-size: 13px; color: #b5a496; margin-bottom: 8px;">เบอร์: <span id="displayPhone"></span></div>
+    <button class="btn" onclick="checkPoints()">ตรวจสอบแต้ม</button>
 
-        <div class="name-edit-box">
-            <input type="text" id="custNameInput" placeholder="กรอกชื่อของคุณ (เช่น ก้อย)">
-            <button onclick="saveCustomerName()">บันทึกชื่อ</button>
-        </div>
+    <div class="result-card" id="resultCard">
+        <div id="displayName" style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 5px;"></div>
+        <div style="font-size: 13px; color: #888;" id="displayPhone"></div>
         
-        <div id="voucherSection" style="display: none;">
-            <div class="voucher-card">
-                <span>🎁 คูปองรับฟรี 1 แก้วสะสม</span>
-                <span style="font-size: 20px;"><span id="voucherCount">0</span> ใบ</span>
-            </div>
-            <div class="voucher-notice">
-                ✨ คุณมีสิทธิ์รับเครื่องดื่มฟรี <strong id="noticeVoucherCount">0</strong> ใบ<br>สามารถแจ้งพนักงานหน้าร้านเพื่อรับสิทธิ์ได้เลยครับ!
-            </div>
-        </div>
+        <div style="font-size: 13px; color: #aaa; margin-top: 15px;">คะแนนสะสมของคุณ</div>
+        <div class="pts-number"><span id="pointsVal">0</span> <span style="font-size: 18px; color: #fff;">แต้ม</span></div>
+        <div style="font-size: 12px; color: #aaa;">(สะสมครบ 10 แต้ม รับคูปองฟรี 1 ใบ)</div>
 
-        <div class="stamp-grid" id="stampGrid"></div>
-        
-        <div class="pts-footer">
-            แต้มสะสมปัจจุบัน <span class="pts-highlight" id="pointCount">0</span> / 10 แต้ม
+        <div class="voucher-box">
+            🎁 คูปองส่วนลด/ฟรีคงเหลือ: <strong id="vouchersVal" style="font-size: 18px; color: #f59e0b;">0</strong> ใบ
         </div>
     </div>
 </div>
 
 <script>
+    // เชื่อมต่อ Firebase ฐานข้อมูลเดียวกันกับหลังร้าน
     const firebaseConfig = { databaseURL: "https://iphone4546-default-rtdb.asia-southeast1.firebasedatabase.app/" };
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    let currentPhone = '';
-
     function checkPoints() {
-        const phone = document.getElementById('userPhone').value.trim();
-        if (phone.length < 9) { 
-            alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง'); 
-            return; 
-        }
-        currentPhone = phone;
-
-        database.ref('loyalty/' + phone).once('value')
-            .then((snapshot) => {
-                const data = snapshot.exists() ? snapshot.val() : {};
-                renderStamps(phone, data.name || '', data.points || 0, data.vouchers || 0);
-            })
-            .catch((error) => {
-                console.error("Firebase Error:", error);
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้ง");
-            });
-    }
-
-    function saveCustomerName() {
-        const newName = document.getElementById('custNameInput').value.trim();
-        if (!newName) { alert('กรุณากรอกชื่อก่อนกดบันทึก'); return; }
-        if (!currentPhone) return;
-
-        database.ref('loyalty/' + currentPhone).update({ name: newName });
-        database.ref('recent_checkins/' + currentPhone).set({
-            name: newName,
-            phone: currentPhone,
-            timestamp: Date.now()
-        });
-
-        alert('บันทึกชื่อเรียบร้อย! พนักงานได้รับข้อมูลแล้วครับ');
-    }
-
-    function renderStamps(phone, name, points, vouchers) {
-        document.getElementById('pointDisplayArea').style.display = 'block';
-        document.getElementById('displayGreeting').innerText = name ? `สวัสดีคุณ ${name}` : 'ยินดีต้อนรับครับ';
-        document.getElementById('custNameInput').value = name;
-        document.getElementById('displayPhone').innerText = phone;
-        document.getElementById('pointCount').innerText = points;
-
-        const voucherSection = document.getElementById('voucherSection');
-        if (vouchers > 0) {
-            voucherSection.style.display = 'block';
-            document.getElementById('voucherCount').innerText = vouchers;
-            document.getElementById('noticeVoucherCount').innerText = vouchers;
-        } else {
-            voucherSection.style.display = 'none';
+        const phone = document.getElementById('phoneInput').value.trim();
+        if (phone.length !== 10 || !/^\d+$/.test(phone)) {
+            alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง 10 หลักครับ');
+            return;
         }
 
-        const grid = document.getElementById('stampGrid');
-        grid.innerHTML = '';
+        database.ref('loyalty/' + phone).once('value').then((snapshot) => {
+            const resultCard = document.getElementById('resultCard');
+            resultCard.style.display = 'block';
 
-        for (let i = 1; i <= 10; i++) {
-            const slot = document.createElement('div');
-            slot.className = `stamp-slot ${i <= points ? 'active' : ''}`;
-            
-            if (i <= points) {
-                slot.innerHTML = `<img src="IMG_1839.PNG" alt="Logo" class="stamp-logo-img">`;
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                document.getElementById('displayName').innerText = data.name ? `คุณ ${data.name}` : 'คุณลูกค้า (ยังไม่ระบุชื่อ)';
+                document.getElementById('displayPhone').innerText = `เบอร์: ${phone}`;
+                document.getElementById('pointsVal').innerText = data.points || 0;
+                document.getElementById('vouchersVal').innerText = data.vouchers || 0;
             } else {
-                slot.innerText = i;
+                document.getElementById('displayName').innerText = 'ยังไม่พบข้อมูลสะสมแต้ม';
+                document.getElementById('displayPhone').innerText = `เบอร์: ${phone}`;
+                document.getElementById('pointsVal').innerText = '0';
+                document.getElementById('vouchersVal').innerText = '0';
+
+                // ถ้ายังไม่มีเบอร์นี้ในระบบ ให้บันทึกลง recent_checkins เพื่อให้หลังร้านเห็นทันที
+                database.ref('recent_checkins').push({
+                    phone: phone,
+                    name: 'ลูกค้ารอใส่ชื่อ',
+                    timestamp: Date.now()
+                });
             }
-            grid.appendChild(slot);
-        }
+        });
     }
 </script>
+
 </body>
 </html>
