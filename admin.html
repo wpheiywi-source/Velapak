@@ -180,7 +180,7 @@
 </div>
 
 <script>
-    const ADMIN_SECRET_CODE = "1234";
+    const ADMIN_SECRET_CODE = "081218";
 
     function checkAdminPassword() {
         const inputVal = document.getElementById('adminPasswordInput').value;
@@ -198,7 +198,10 @@
         }
     });
 
-    const firebaseConfig = { databaseURL: "https://iphone4546-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    const firebaseConfig = { 
+        projectId: "iphone4546",
+        databaseURL: "https://iphone4546-default-rtdb.asia-southeast1.firebasedatabase.app/" 
+    };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
