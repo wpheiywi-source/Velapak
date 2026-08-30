@@ -180,7 +180,7 @@
 </div>
 
 <script>
-    const ADMIN_SECRET_CODE = "1234"; // เปลี่ยนรหัสผ่านหลังร้านตรงนี้ได้
+    const ADMIN_SECRET_CODE = "1234";
 
     function checkAdminPassword() {
         const inputVal = document.getElementById('adminPasswordInput').value;
@@ -198,7 +198,7 @@
         }
     });
 
-    const firebaseConfig = { databaseURL: "https://wela-phak-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    const firebaseConfig = { databaseURL: "https://iphone4546-default-rtdb.asia-southeast1.firebasedatabase.app/" };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
