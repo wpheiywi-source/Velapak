@@ -49,7 +49,6 @@
             cursor: pointer;
         }
 
-        /* Swipe container สำหรับปัดซ้ายลบ */
         .swipe-wrapper {
             position: relative;
             overflow: hidden;
@@ -296,7 +295,7 @@
 </div>
 
 <script>
-    const ADMIN_SECRET_CODE = "081218"; // เปลี่ยนรหัสผ่านเป็น 081218 ตามที่ขอครับ
+    const ADMIN_SECRET_CODE = "081218"; // รหัสผ่านหลังร้าน
 
     function checkAdminPassword() {
         const inputVal = document.getElementById('adminPasswordInput').value;
@@ -314,7 +313,8 @@
         }
     });
 
-    const firebaseConfig = { databaseURL: "https://wela-phak-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    // แก้ไขลิงก์ Firebase ให้ตรงกับฐานข้อมูลของพี่แล้วครับ
+    const firebaseConfig = { databaseURL: "https://iphone4546-default-rtdb.asia-southeast1.firebasedatabase.app/" };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
