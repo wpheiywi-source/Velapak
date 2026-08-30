@@ -8,7 +8,6 @@
     <style>
         * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
         body { 
-            /* เอาฟิลเตอร์สีขาวออก และจัดตำแหน่งภาพพื้นหลังให้อยู่ตรงกลางพอดี */
             background-image: url('WLOR6331.PNG');
             background-size: cover;
             background-position: center center;
@@ -38,7 +37,6 @@
         }
         .header-title-container { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
         
-        /* แก้ไขโลโก้ด้านบนให้แสดงผลเต็มวง ไม่โดนตัดขอบ */
         .inline-logo { 
             width: 56px; 
             height: 56px; 
@@ -79,7 +77,6 @@
         }
         .stamp-slot.active { border: 2px solid #b8860b; background: #fffdf9; box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15); }
         
-        /* แก้ไขโลโก้ในช่องแต้มด้านล่างให้แสดงเต็มวงสวยงาม */
         .stamp-logo-img {
             width: 100%;
             height: 100%;
@@ -100,7 +97,8 @@
     <div class="brand-badge">VELAPAK LOYALTY</div>
     
     <div class="header-title-container">
-        <img src="IMG_1839_3.PNG" alt="เวลาพักคาเฟ่" class="inline-logo">
+        <!-- เปลี่ยนชื่อไฟล์รูปตรงนี้ให้ตรงกับในเครื่องแล้วครับ (IMG_1839.PNG) -->
+        <img src="IMG_1839.PNG" alt="เวลาพักคาเฟ่" class="inline-logo">
         <div class="logo">เวลาพักคาเฟ่</div>
     </div>
     
@@ -205,7 +203,7 @@
             slot.className = `stamp-slot ${i <= points ? 'active' : ''}`;
             
             if (i <= points) {
-                slot.innerHTML = `<img src="IMG_1839_3.PNG" alt="Logo" class="stamp-logo-img">`;
+                slot.innerHTML = `<img src="IMG_1839.PNG" alt="Logo" class="stamp-logo-img">`;
             } else {
                 slot.innerText = i;
             }
