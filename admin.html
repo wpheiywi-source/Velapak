@@ -56,7 +56,6 @@
         .result-box {
             margin-top: 15px; background: #faf8f5; border: 1px solid #dcd2c5; border-radius: 14px; padding: 16px; text-align: center;
         }
-        .customer-info { font-size: 16px; color: #7c685c; margin-bottom: 4px; }
         .points-badge { font-size: 24px; font-weight: 700; color: #b8860b; margin: 12px 0; }
         
         .btn-group { display: flex; gap: 8px; margin-top: 15px; }
@@ -88,11 +87,10 @@
 
     <div id="manageArea" style="display: none;">
         <div class="result-box">
-            <div class="customer-info">เบอร์โทร: <span id="resPhone" style="font-weight: 600; color: #4a3b32;"></span></div>
+            <div style="font-size: 14px; color: #7c685c; margin-bottom: 6px;">เบอร์โทร: <span id="resPhone" style="font-weight: 600; color: #4a3b32;"></span></div>
             
-            <!-- ช่องแก้ไขชื่อลูกค้า -->
-            <div style="margin-top: 10px;">
-                <label style="font-size: 12px; text-align: left; margin-bottom: 4px;">ชื่อลูกค้า:</label>
+            <div style="text-align: left;">
+                <label style="font-size: 12px; margin-bottom: 4px;">ชื่อลูกค้า:</label>
                 <div class="name-edit-box">
                     <input type="text" id="resNameInput" placeholder="ระบุชื่อลูกค้า">
                     <button onclick="saveCustomerName()">บันทึกชื่อ</button>
