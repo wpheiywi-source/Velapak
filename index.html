@@ -8,42 +8,79 @@
     <style>
         * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
         body { 
-            background: #1a1512; color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; 
+            /* พื้นหลังภาพวาดสีน้ำ พร้อมเลเยอร์สีครีมโปร่งแสงเพื่อความสบายตาและให้อ่านหนังสือได้ง่าย */
+            background-image: linear-gradient(rgba(247, 243, 237, 0.88), rgba(247, 243, 237, 0.88)), url('WLOR6331.PNG');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #4a3b32; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 24px 16px; 
         }
         .card { 
-            background: #2b221c; width: 100%; max-width: 420px; border-radius: 24px; padding: 28px 22px; border: 1px solid #42342b; box-shadow: 0 15px 35px rgba(0,0,0,0.5); text-align: center; 
+            background: rgba(255, 255, 255, 0.92); 
+            backdrop-filter: blur(8px);
+            width: 100%; 
+            max-width: 420px; 
+            border-radius: 24px; 
+            padding: 28px 22px; 
+            border: 1px solid #e3d7cb; 
+            box-shadow: 0 15px 35px rgba(139, 111, 93, 0.2); 
+            text-align: center; 
         }
         .brand-badge {
-            display: inline-block; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-bottom: 16px; border: 1px solid rgba(245, 158, 11, 0.3);
+            display: inline-block; background: rgba(184, 134, 11, 0.1); color: #b8860b; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-bottom: 16px; border: 1px solid rgba(184, 134, 11, 0.3);
         }
         .header-title-container { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
-        .inline-logo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #f59e0b; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #333; }
-        .logo { font-size: 26px; font-weight: 700; color: #f59e0b; line-height: 1.2; }
-        .subtitle { font-size: 14px; color: #a1a1aa; margin-bottom: 24px; }
-        .phone-input-box { 
-            display: flex; gap: 8px; background: #181310; padding: 6px; border-radius: 14px; border: 1px solid #3d3027; margin-bottom: 12px;
-        }
-        .phone-input-box input { flex: 1; padding: 10px; border: none; background: transparent; color: #fff; font-size: 16px; outline: none; text-align: center; }
-        .phone-input-box button { background: #f59e0b; color: #1a0f00; border: none; padding: 0 18px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
         
-        .name-edit-box { background: #221a14; border: 1px solid #42342b; border-radius: 14px; padding: 10px; margin-bottom: 20px; display: flex; gap: 8px; }
-        .name-edit-box input { flex: 1; background: transparent; border: none; color: #fcd34d; font-size: 14px; text-align: center; outline: none; }
+        /* โลโก้กลมด้านบน */
+        .inline-logo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid #b8860b; box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3); }
+        
+        .logo { font-size: 26px; font-weight: 700; color: #4a3b32; line-height: 1.2; }
+        .subtitle { font-size: 14px; color: #7c685c; margin-bottom: 24px; }
+        
+        .phone-input-box { 
+            display: flex; gap: 8px; background: #faf8f5; padding: 6px; border-radius: 14px; border: 1px solid #dcd2c5; margin-bottom: 12px;
+        }
+        .phone-input-box input { flex: 1; padding: 10px; border: none; background: transparent; color: #4a3b32; font-size: 16px; outline: none; text-align: center; }
+        .phone-input-box input::placeholder { color: #b5a496; }
+        .phone-input-box button { background: #b8860b; color: #fff; border: none; padding: 0 18px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+        .phone-input-box button:hover { background: #996f08; }
+        
+        .name-edit-box { background: #faf8f5; border: 1px solid #dcd2c5; border-radius: 14px; padding: 10px; margin-bottom: 20px; display: flex; gap: 8px; }
+        .name-edit-box input { flex: 1; background: transparent; border: none; color: #b8860b; font-size: 14px; text-align: center; outline: none; font-weight: 600; }
         .name-edit-box button { background: #10b981; color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
         
-        .customer-greeting { font-size: 18px; font-weight: 600; color: #fef3c7; margin-bottom: 2px; }
+        .customer-greeting { font-size: 18px; font-weight: 600; color: #4a3b32; margin-bottom: 2px; }
+        
         .voucher-card { 
             background: linear-gradient(135deg, #fef08a, #fde047, #eab308); border-radius: 14px; padding: 14px 18px; color: #451a03; font-weight: 700; margin: 16px 0 8px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 20px rgba(234, 179, 8, 0.3);
         }
         .voucher-notice {
-            font-size: 13px; color: #fcd34d; background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 8px 12px; margin-bottom: 16px; line-height: 1.4;
+            font-size: 13px; color: #85581a; background: rgba(184, 134, 11, 0.08); border: 1px dashed rgba(184, 134, 11, 0.3); border-radius: 10px; padding: 8px 12px; margin-bottom: 16px; line-height: 1.4;
         }
+        
         .stamp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
         .stamp-slot { 
-            width: 100%; aspect-ratio: 1; border: 2px dashed #4a3c33; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: #71717a; background: #181310; overflow: hidden; padding: 2px;
+            width: 100%; aspect-ratio: 1; border: 2px dashed #dcd2c5; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: #b5a496; background: #faf8f5; overflow: hidden; padding: 4px;
         }
-        .stamp-slot.active { border: 2px solid #f59e0b; background: #3d2f24; }
-        .pts-footer { margin-top: 15px; font-size: 14px; color: #a1a1aa; }
-        .pts-highlight { font-size: 22px; font-weight: 700; color: #f59e0b; }
+        .stamp-slot.active { border: 2px solid #b8860b; background: #fffdf9; box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15); }
+        
+        /* สไตล์รูปลักษณะวงกลมแทนที่ถ้วยกาแฟเดิมในช่องสะสมแต้ม */
+        .stamp-logo-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .pts-footer { margin-top: 15px; font-size: 14px; color: #7c685c; }
+        .pts-highlight { font-size: 22px; font-weight: 700; color: #b8860b; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -54,7 +91,8 @@
     <div class="brand-badge">VELAPAK LOYALTY</div>
     
     <div class="header-title-container">
-        <div class="inline-logo">☕</div>
+        <!-- โลโก้หลักด้านบน -->
+        <img src="IMG_1839_3.PNG" alt="เวลาพักคาเฟ่" class="inline-logo">
         <div class="logo">เวลาพักคาเฟ่</div>
     </div>
     
@@ -67,7 +105,7 @@
 
     <div id="pointDisplayArea" style="display: none;">
         <div class="customer-greeting" id="displayGreeting"></div>
-        <div style="font-size: 13px; color: #71717a; margin-bottom: 8px;">เบอร์: <span id="displayPhone"></span></div>
+        <div style="font-size: 13px; color: #b5a496; margin-bottom: 8px;">เบอร์: <span id="displayPhone"></span></div>
 
         <div class="name-edit-box">
             <input type="text" id="custNameInput" placeholder="กรอกชื่อของคุณ (เช่น ก้อย)">
@@ -159,7 +197,8 @@
             slot.className = `stamp-slot ${i <= points ? 'active' : ''}`;
             
             if (i <= points) {
-                slot.innerHTML = '☕';
+                // ใส่โลโก้ร้านทรงกลมแทนที่ถ้วยกาแฟเดิม
+                slot.innerHTML = `<img src="IMG_1839_3.PNG" alt="Logo" class="stamp-logo-img">`;
             } else {
                 slot.innerText = i;
             }
